@@ -474,5 +474,36 @@ module Radix
       (!different) &&
         (!key_reader.has_next? || _check_markers(key_reader.current_char))
     end
+
+
+    # Prints out each node, with branches similar to `tree` in the shell.
+    def pretty_print(pp : PrettyPrint)
+      pretty_print pp, @root
+    end
+  
+    # Recurses through children; prefix is spaces and branches like the `tree` command
+    # Node will be the current node and if it has children, we will recurse down this function to get the whole lot.
+    # TODO: custom indentation level, change the appearance of bars,
+    # Also specify if we want to print the value, seeing as some of these may not render nicely.
+    def pretty_print(pp : PrettyPrint, node, prefix : String = "")
+      node.children.each_with_index { |child, index|
+      
+        # Print the bars nicely for the last element.
+        is_last = index == node.children.size - 1
+        line   = is_last ? "└── " : "├── "
+        indent = is_last ? "    " : "|   "
+        
+        
+        # TODO - pretty-print here? Or just use to_s?
+        # Ouptuts the node's key as well as the payload.
+        pp.text "#{ prefix }#{ line }#{ child.key }: #{ child.payload? && child.payload }"
+        pp.breakable
+
+        # Now recurse, with the leading characters and indentatioin
+        pretty_print(pp, child, prefix: prefix + indent)
+      }
+    end
+
   end
+
 end
